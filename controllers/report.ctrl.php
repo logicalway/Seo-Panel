@@ -656,25 +656,23 @@ class ReportController extends Controller {
 			}
 			
 			$seUrl = str_replace('[--start--]', $this->seList[$seInfoId]['start'], $searchUrl);
-
-            // if google add special parameters
-            $isGoogle = false;
-            if (stristr($this->seList[$seInfoId]['url'], 'google')) {
-                $isGoogle = true;
-                $seUrl .= "&ie=utf-8&pws=0&gl=".$keywordInfo['country_code'];
-                // $seUrl = str_replace('[--lang--]', '', $seUrl);
-                $seUrl = str_replace('[--lang--]', $keywordInfo['lang_code']."-".$keywordInfo['country_code'], $seUrl);
-            } else {
-                $seUrl = str_replace('[--lang--]', $keywordInfo['lang_code'], $seUrl);
-            }
+			
+			// if google add special parameters
+			$isGoogle = false;
+			if (stristr($this->seList[$seInfoId]['url'], 'google')) {
+			    $isGoogle = true;
+			    $seUrl .= "&ie=utf-8&pws=0&gl=".$keywordInfo['country_code'];
+                $seUrl = str_replace('[--lang--]', $keywordInfo['lang_code']."-".$keywordInfo['country_code'], $seUrl); // jpi $seUrl = str_replace('[--lang--]', '', $seUrl);
+			} else {
+				$seUrl = str_replace('[--lang--]', $keywordInfo['lang_code'], $seUrl);
+			}
 			
 			if(!empty($this->seList[$seInfoId]['cookie_send'])){
 				$this->seList[$seInfoId]['cookie_send'] = str_replace('[--lang--]', $keywordInfo['lang_code'], $this->seList[$seInfoId]['cookie_send']);
 				$this->spider->_CURLOPT_COOKIE = $this->seList[$seInfoId]['cookie_send'];				
 			}
-
-			include(dirname( __FILE__ )."/_perso_flat_file1.php"); // jpi
-			// $result = $this->spider->getContent($seUrl);
+			
+			include(dirname( __FILE__ )."/_perso_flat_file1.php"); // jpi $result = $this->spider->getContent($seUrl);
 			$pageContent = $this->formatPageContent($seInfoId, $result['page']);
 			
 			$crawlLogCtrl = new CrawlLogController();
@@ -691,8 +689,7 @@ class ReportController extends Controller {
 				$crawlLogCtrl->updateCrawlLog($logId, $crawlInfo);
 				sleep(SP_CRAWL_DELAY);
 				$seUrl = str_replace('[--start--]', $seStart, $searchUrl);
-				include(dirname( __FILE__ )."/_perso_flat_file2.php"); // jpi
-				// $result = $this->spider->getContent($seUrl);
+				include(dirname( __FILE__ )."/_perso_flat_file2.php"); // jpi $result = $this->spider->getContent($seUrl);
 				$pageContent .= $this->formatPageContent($seInfoId, $result['page']);
 				$seStart += $this->seList[$seInfoId]['start_offset'];
 			}
@@ -809,19 +806,13 @@ class ReportController extends Controller {
 		
 		return  $crawlResult;
 	}
-
-    // include(dirname( __FILE__ )."/_perso_flat_function.php");
-    function perso_duplicate_file($file,$result_json,$num_start,$numb_stop) {
-
-	    // jpi
-
-        $file1 = str_replace('_'.$num_start.'_','_'.$numb_stop.'_',$file);
-        $fp = fopen($file1, "w");
-        fputs($fp,$result_json);
-        fclose($fp);
-
-    }
-
+	// jpi
+	function perso_duplicate_file($file,$result_json,$num_start,$numb_stop) {
+		$file1 = str_replace('_'.$num_start.'_','_'.$numb_stop.'_',$file);
+		$fp = fopen($file1, "w");
+		fputs($fp,$result_json);
+		fclose($fp);
+	}
 	# func to save the report
 	function saveMatchedKeywordInfo($matchInfo, $remove=false) {
 		$time = mktime(0, 0, 0, date('m'), date('d'), date('Y'));
@@ -964,6 +955,7 @@ class ReportController extends Controller {
 			'keyword-search-reports' => $this->spTextTools['Keyword Search Summary'],
 		    'social-media-reports' => $this->spTextTools['Social Media Report Summary'],
 		    'analytics-reports' => $this->spTextTools['Website Analytics Summary'],
+		    'review-reports' => $this->spTextTools['Review Report Summary'],
 		);
 		$this->set('reportTypes', $reportTypes);
 		$urlarg .= "&report_type=".$searchInfo['report_type'];		
@@ -1262,10 +1254,11 @@ class ReportController extends Controller {
 		}
 		
 		# website search report section
-		if (empty($searchInfo['report_type']) || in_array($searchInfo['report_type'], array('social-media-reports', 'website-search-reports', 'keyword-search-reports', 'sitemap-reports', 'analytics-reports')) ) {
+		if (empty($searchInfo['report_type']) || in_array($searchInfo['report_type'], array('review-reports', 'social-media-reports', 'website-search-reports', 'keyword-search-reports', 'sitemap-reports', 'analytics-reports')) ) {
 		    include_once(SP_CTRLPATH."/analytics.ctrl.php");
 			$webMasterCtrler = new WebMasterController();
 			$socialMediaCtrler = New SocialMediaController();
+			$reviewCtrler = New ReviewManagerController();
 			$webMasterCtrler->set('spTextTools', $this->spTextTools);
 			$webMasterCtrler->spTextTools = $this->spTextTools;
 			$filterList = $searchInfo;
@@ -1316,6 +1309,16 @@ class ReportController extends Controller {
 				$socialMediaCtrler->spTextTools = $this->spTextTools;
 				$socialMediaReport = $socialMediaCtrler->viewReportSummary($filterList, true, $cronUserId);
 			}
+
+			// if social media reports
+			if (empty($searchInfo['report_type']) || ($searchInfo['report_type'] == 'review-reports')) {
+				$filterList['from_time'] = $fromTimeShort;
+				$filterList['to_time'] = $toTimeShort;
+				$reviewCtrler->set('spTextTools', $this->spTextTools);
+				$reviewCtrler->set('spTextPanel', $this->spTextPanel);
+				$reviewCtrler->spTextTools = $this->spTextTools;
+				$reviewReport = $reviewCtrler->viewReportSummary($filterList, true, $cronUserId);
+			}
 			
 			if ($exportVersion) {
 				$exportContent .= $websiteSearchReport;
@@ -1326,6 +1329,7 @@ class ReportController extends Controller {
 				$this->set('keywordSearchReport', $keywordSearchReport);
 				$this->set('sitemapReport', $sitemapReport);
 				$this->set('socialMediaReport', $socialMediaReport);
+				$this->set('reviewReport', $reviewReport);
 				$this->set('analyticsReport', $analyticsReport);
 			}
 			
@@ -1463,8 +1467,8 @@ class ReportController extends Controller {
 		
 	# function to sent Email Notification For ReportGeneration
 	function sentEmailNotificationForReportGen($userInfo, $fromTime, $toTime) {
-	    
-	    $searchInfo = array(
+		$fromTime = !empty($fromTime) ? $fromTime : date('Y-m-d', strtotime('-1 days'));
+		$searchInfo = array(
     	    'website_id' => 0,
             'report_type' => '',
             'from_time' => date('Y-m-d', $fromTime),
