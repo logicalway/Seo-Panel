@@ -26,7 +26,8 @@ class WebsiteController extends Controller{
 	# func to show websites
 	function listWebsites($info=''){		
 		
-		$userId = isLoggedIn();		
+		$userId = isLoggedIn();	
+		if( isset($info['pageno']) ) {} else { $info['pageno'] = 0; } 	
 		$info['pageno'] = intval($info['pageno']);
 		$pageScriptPath = 'websites.php?stscheck=';
 		$pageScriptPath .= isset($info['stscheck']) ? $info['stscheck'] : "select";
