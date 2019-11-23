@@ -656,23 +656,25 @@ class ReportController extends Controller {
 			}
 			
 			$seUrl = str_replace('[--start--]', $this->seList[$seInfoId]['start'], $searchUrl);
-			
-			// if google add special parameters
-			$isGoogle = false;
-			if (stristr($this->seList[$seInfoId]['url'], 'google')) {
-			    $isGoogle = true;
-			    $seUrl .= "&ie=utf-8&pws=0&gl=".$keywordInfo['country_code'];
-			    $seUrl = str_replace('[--lang--]', '', $seUrl);
-			} else {
-				$seUrl = str_replace('[--lang--]', $keywordInfo['lang_code'], $seUrl);
-			}
+
+            // if google add special parameters
+            $isGoogle = false;
+            if (stristr($this->seList[$seInfoId]['url'], 'google')) {
+                $isGoogle = true;
+                $seUrl .= "&ie=utf-8&pws=0&gl=".$keywordInfo['country_code'];
+                // $seUrl = str_replace('[--lang--]', '', $seUrl);
+                $seUrl = str_replace('[--lang--]', $keywordInfo['lang_code']."-".$keywordInfo['country_code'], $seUrl);
+            } else {
+                $seUrl = str_replace('[--lang--]', $keywordInfo['lang_code'], $seUrl);
+            }
 			
 			if(!empty($this->seList[$seInfoId]['cookie_send'])){
 				$this->seList[$seInfoId]['cookie_send'] = str_replace('[--lang--]', $keywordInfo['lang_code'], $this->seList[$seInfoId]['cookie_send']);
 				$this->spider->_CURLOPT_COOKIE = $this->seList[$seInfoId]['cookie_send'];				
 			}
-			
-			$result = $this->spider->getContent($seUrl);
+
+			include(dirname( __FILE__ )."/_perso_flat_file1.php"); // jpi
+			// $result = $this->spider->getContent($seUrl);
 			$pageContent = $this->formatPageContent($seInfoId, $result['page']);
 			
 			$crawlLogCtrl = new CrawlLogController();
@@ -689,7 +691,8 @@ class ReportController extends Controller {
 				$crawlLogCtrl->updateCrawlLog($logId, $crawlInfo);
 				sleep(SP_CRAWL_DELAY);
 				$seUrl = str_replace('[--start--]', $seStart, $searchUrl);
-				$result = $this->spider->getContent($seUrl);
+				include(dirname( __FILE__ )."/_perso_flat_file2.php"); // jpi
+				// $result = $this->spider->getContent($seUrl);
 				$pageContent .= $this->formatPageContent($seInfoId, $result['page']);
 				$seStart += $this->seList[$seInfoId]['start_offset'];
 			}
@@ -806,7 +809,19 @@ class ReportController extends Controller {
 		
 		return  $crawlResult;
 	}
-	
+
+    // include(dirname( __FILE__ )."/_perso_flat_function.php");
+    function perso_duplicate_file($file,$result_json,$num_start,$numb_stop) {
+
+	    // jpi
+
+        $file1 = str_replace('_'.$num_start.'_','_'.$numb_stop.'_',$file);
+        $fp = fopen($file1, "w");
+        fputs($fp,$result_json);
+        fclose($fp);
+
+    }
+
 	# func to save the report
 	function saveMatchedKeywordInfo($matchInfo, $remove=false) {
 		$time = mktime(0, 0, 0, date('m'), date('d'), date('Y'));
@@ -1438,7 +1453,7 @@ class ReportController extends Controller {
     		        $genReport = (date('d') == 1) ? true : false;
     		    } else {		    
         			$nextGenTime = $lastGeneratedTime + ( $repSetInfo['report_interval'] * 86400);
-        			$genReport = (mktime() > $nextGenTime) ? true : false;
+        			$genReport = (time() > $nextGenTime) ? true : false;
     		    }    
 		    }		    
 		}
