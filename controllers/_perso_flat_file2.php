@@ -20,9 +20,14 @@ if( file_exists($file) && filesize($file) > 0 ) {
 
         $result_json = json_encode($result);
 
-        $fp = fopen($file, "w");
-        fputs($fp,$result_json);
-        fclose($fp);
+        // si le captcha de Google apparait
+        if( strlen($result_json) > 4000 ) {
+
+            $fp = fopen($file, "w");
+            fputs($fp, $result_json);
+            fclose($fp);
+
+        }
 
     }
 
