@@ -671,11 +671,23 @@ class ReportController extends Controller {
 				$this->seList[$seInfoId]['cookie_send'] = str_replace('[--lang--]', $keywordInfo['lang_code'], $this->seList[$seInfoId]['cookie_send']);
 				$this->spider->_CURLOPT_COOKIE = $this->seList[$seInfoId]['cookie_send'];				
 			}
-			
-			include(dirname( __FILE__ )."/_perso_flat_file1.php"); // jpi $result = $this->spider->getContent($seUrl);
+
+            include(dirname( __FILE__ )."/_perso_flat_file1.php"); // jpi $result = $this->spider->getContent($seUrl);
 			$pageContent = $this->formatPageContent($seInfoId, $result['page']);
 			
+			// testing code for regex
+            /*$testFileName = SP_TMPPATH . "/google.html";
+            $myfile = fopen($testFileName, "w") or die("Unable to open file!");
+            fwrite($myfile, $pageContent);
+            fclose($myfile);
+            exit;
+            
+            $myfile = fopen($testFileName, "r") or die("Unable to open file!");
+            $pageContent = fread($myfile,filesize($testFileName));
+            fclose($myfile);*/
+			
 			$crawlLogCtrl = new CrawlLogController();
+			$crawlInfo = [];
 			$crawlInfo['crawl_type'] = 'keyword';
 			$crawlInfo['ref_id'] = empty($keywordInfo['id']) ? $keywordInfo['name'] : $keywordInfo['id'];
 			$crawlInfo['subject'] = $seInfoId;
@@ -689,7 +701,7 @@ class ReportController extends Controller {
 				$crawlLogCtrl->updateCrawlLog($logId, $crawlInfo);
 				sleep(SP_CRAWL_DELAY);
 				$seUrl = str_replace('[--start--]', $seStart, $searchUrl);
-				include(dirname( __FILE__ )."/_perso_flat_file2.php"); // jpi $result = $this->spider->getContent($seUrl);
+                include(dirname( __FILE__ )."/_perso_flat_file2.php"); // jpi $result = $this->spider->getContent($seUrl);
 				$pageContent .= $this->formatPageContent($seInfoId, $result['page']);
 				$seStart += $this->seList[$seInfoId]['start_offset'];
 			}
@@ -806,13 +818,13 @@ class ReportController extends Controller {
 		
 		return  $crawlResult;
 	}
-	// jpi
-	function perso_duplicate_file($file,$result_json,$num_start,$numb_stop) {
-		$file1 = str_replace('_'.$num_start.'_','_'.$numb_stop.'_',$file);
-		$fp = fopen($file1, "w");
-		fputs($fp,$result_json);
-		fclose($fp);
-	}
+    // jpi
+    function perso_duplicate_file($file,$result_json,$num_start,$numb_stop) {
+        $file1 = str_replace('_'.$num_start.'_','_'.$numb_stop.'_',$file);
+        $fp = fopen($file1, "w");
+        fputs($fp,$result_json);
+        fclose($fp);
+    }
 	# func to save the report
 	function saveMatchedKeywordInfo($matchInfo, $remove=false) {
 		$time = mktime(0, 0, 0, date('m'), date('d'), date('Y'));

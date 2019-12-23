@@ -26,8 +26,7 @@ class WebsiteController extends Controller{
 	# func to show websites
 	function listWebsites($info=''){		
 		
-		$userId = isLoggedIn();	
-		if( isset($info['pageno']) ) {} else { $info['pageno'] = 0; } 	
+		$userId = isLoggedIn();		
 		$info['pageno'] = intval($info['pageno']);
 		$pageScriptPath = 'websites.php?stscheck=';
 		$pageScriptPath .= isset($info['stscheck']) ? $info['stscheck'] : "select";
@@ -106,6 +105,13 @@ class WebsiteController extends Controller{
 		$sql .= " order by name";
 		$websiteList = $this->db->select($sql);
 		return $websiteList;
+	}
+	
+	function __getUserWebsites($userId, $searchInfo=[]) {
+	    $cond = "user_id=".intval($userId);
+	    $cond .= isset($searchInfo['status']) ? " and status=".intval($searchInfo['status']) : "";
+	    $cond .= isset($searchInfo['search']) ? " and url like '%".addslashes($searchInfo['search'])."%'" : "";
+        return $this->dbHelper->getAllRows('websites', $cond);
 	}
 	
 	# func to get all Websites
