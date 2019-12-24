@@ -820,10 +820,13 @@ class ReportController extends Controller {
 	}
     // jpi
     function perso_duplicate_file($file,$result_json,$num_start,$numb_stop) {
-        $file1 = str_replace('_'.$num_start.'_','_'.$numb_stop.'_',$file);
-        $fp = fopen($file1, "w");
-        fputs($fp,$result_json);
-        fclose($fp);
+        // si le captcha de Google apparait
+        if( strlen($result_json) > 4000 ) {
+            $file1 = str_replace('_'.$num_start.'_','_'.$numb_stop.'_',$file);
+            $fp = fopen($file1, "w");
+            fputs($fp,$result_json);
+            fclose($fp);
+        }
     }
 	# func to save the report
 	function saveMatchedKeywordInfo($matchInfo, $remove=false) {
