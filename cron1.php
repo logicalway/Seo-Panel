@@ -43,6 +43,11 @@
     include_once(SP_CTRLPATH."/moz.ctrl.php");
     include_once(SP_CTRLPATH."/webmaster.ctrl.php");
 
+    include_once(SP_CTRLPATH."/social_media.ctrl.php");
+    include_once(SP_CTRLPATH."/review_manager.ctrl.php");
+    include_once(SP_CTRLPATH."/analytics.ctrl.php");
+    include_once(SP_CTRLPATH."/information.ctrl.php");
+
     $controller = New CronController();
     $controller->timeStamp = mktime(0, 0, 0, date('m'), date('d'), date('Y'));
 
@@ -64,6 +69,17 @@
 
     // call cronjob function
     echo "\n\n=== Cron job execution started on - " . date("Y-m-d H:i:s") . " ===\n";
+
+    // sync search engines
+    $seCtrler = new SearchEngineController();
+    $ret_sync = $seCtrler->doSyncSearchEngines(true, true);
+    echo $ret_sync['result'] . "\n";
+
+    // check system alerts
+    $alertCtrler = new AlertController();
+    $ret_sync = $alertCtrler->updateSystemAlerts();
+    echo $ret_sync['result'] . "\n";
+
     $controller->executeCron($includeList, $userList);
     echo "\n=== Cron job execution completed on - " . date("Y-m-d H:i:s") . " ===\n\n";
 
@@ -74,8 +90,6 @@
     echo "Clearing crawl logs before " . SP_CRAWL_LOG_CLEAR_TIME . " days";
 
     $message = ob_get_clean();
-
-    // nl2br()
 
     echo $message;
 
