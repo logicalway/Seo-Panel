@@ -27,8 +27,7 @@ class WebsiteController extends Controller{
 	function listWebsites($info=''){		
 		
 		$userId = isLoggedIn();
-        if( isset($info['pageno']) ) {} else { $info['pageno'] = 0; }
-		$info['pageno'] = intval($info['pageno']);
+		if( isset($info['pageno']) ) {} else { $info['pageno'] = 0; } // $info['pageno'] = intval($info['pageno']);
 		$pageScriptPath = 'websites.php?stscheck=';
 		$pageScriptPath .= isset($info['stscheck']) ? $info['stscheck'] : "select";
 		
