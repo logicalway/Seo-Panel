@@ -627,21 +627,28 @@ class ReportController extends Controller {
 	
 	# func to crawl keyword
 	function crawlKeyword( $keywordInfo, $seId='', $cron=false, $removeDuplicate=true) {
+	    
+	    // check whether any api source is enabled for crawl keyword
+	    list($resDataStatus, $resData) = SettingsController::getSearchResults($keywordInfo, $this->showAll, $seId, $cron);
+	    if ($resDataStatus) {
+	        $this->seFound = true;
+	        if (!empty($seId)) {
+	            $this->seFound = isset($resData[$seId]['seFound']) ? $resData[$seId]['seFound'] : 0;
+	        }
+	        
+	        return $resData;
+	    }
+	    
 		$crawlResult = array();
 		$websiteUrl = formatUrl($keywordInfo['url'], false);
 		if(empty($websiteUrl)) return $crawlResult;
 		if(empty($keywordInfo['name'])) return $crawlResult;
 		
-		// fix for www. and no www. in search results
-		if (stristr($websiteUrl, "www.")) {
-		    $websiteOtherUrl = str_ireplace("www.", "", $websiteUrl);
-		} else {
-		    $websiteOtherUrl = "www." . $websiteUrl;
-		}
+		$websiteOtherUrl = SettingsController::getWebsiteOtherUrl($websiteUrl);
 		
 		$time = mktime(0, 0, 0, date('m'), date('d'), date('Y'));
 		$seList = explode(':', $keywordInfo['searchengines']);
-		foreach($seList as $seInfoId){
+		foreach($seList as $seInfoId) {
 			
 			// function to execute only passed search engine
 			if(!empty($seId) && ($seInfoId != $seId)) continue;
@@ -662,8 +669,8 @@ class ReportController extends Controller {
 			    $searchUrl = str_replace('&cr=country&', '&cr=&', $searchUrl);
 			}
 
-			$seUrl = str_replace('[--lang--]', $keywordInfo['lang_code']."-".$keywordInfo['country_code'], $searchUrl); // jpi $seUrl = str_replace('[--start--]', $this->seList[$seInfoId]['start'], $searchUrl);
-
+			$seUrl = str_replace('[--start--]', $this->seList[$seInfoId]['start'], $searchUrl);
+			
 			// if google add special parameters
 			$isGoogle = false;
 			if (stristr($this->seList[$seInfoId]['url'], 'google')) {
@@ -671,7 +678,7 @@ class ReportController extends Controller {
 			    $seUrl .= "&ie=utf-8&pws=0&gl=".$keywordInfo['country_code'];
 			    $seUrl = str_replace('[--lang--]', '', $seUrl);
 			} else {
-				$seUrl = str_replace('[--lang--]', $keywordInfo['lang_code'], $seUrl);
+				$seUrl = str_replace('[--lang--]', $keywordInfo['lang_code']."-".$keywordInfo['country_code'], $searchUrl); // jpi $seUrl = str_replace('[--lang--]', $keywordInfo['lang_code'], $seUrl);
 			}
 			
 			if(!empty($this->seList[$seInfoId]['cookie_send'])){
