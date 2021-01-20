@@ -676,9 +676,9 @@ class ReportController extends Controller {
 			if (stristr($this->seList[$seInfoId]['url'], 'google')) {
 			    $isGoogle = true;
 			    $seUrl .= "&ie=utf-8&pws=0&gl=".$keywordInfo['country_code'];
-			    $seUrl = str_replace('[--lang--]', '', $seUrl);
+                $seUrl = str_replace('[--lang--]', $keywordInfo['lang_code'], $seUrl); // jpi $seUrl = str_replace('[--lang--]', '', $seUrl);
 			} else {
-				$seUrl = str_replace('[--lang--]', $keywordInfo['lang_code']."-".$keywordInfo['country_code'], $searchUrl); // jpi $seUrl = str_replace('[--lang--]', $keywordInfo['lang_code'], $seUrl);
+				$seUrl = str_replace('[--lang--]', $keywordInfo['lang_code'], $seUrl);
 			}
 			
 			if(!empty($this->seList[$seInfoId]['cookie_send'])){
