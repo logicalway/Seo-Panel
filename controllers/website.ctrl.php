@@ -24,7 +24,7 @@
 class WebsiteController extends Controller{
 
 	# func to show websites
-	function listWebsites($info=''){		
+	function listWebsites($info=[]){		
 		
 		$userId = isLoggedIn();
         if( isset($info['pageno']) ) { $info['pageno'] = intval($info['pageno']); } else { $info['pageno'] = 0; } // $info['pageno'] = intval($info['pageno']);
@@ -211,7 +211,7 @@ class WebsiteController extends Controller{
 		    
 	}
 
-	function newWebsite($info='') {
+	function newWebsite($info=[]) {
 		$userId = isLoggedIn();
 		
 		// check whether user have only readonly website access 

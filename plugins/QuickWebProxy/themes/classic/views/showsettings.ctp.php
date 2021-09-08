@@ -2,7 +2,7 @@
 <?php if(!empty($saved)) showSuccessMsg($spTextSettings['allsettingssaved'], false); ?>
 <form id="updateSettings">
 <input type="hidden" value="update" name="sec">
-<table width="100%" border="0" cellspacing="0" cellpadding="0" class="list">
+<table class="list">
 	<tr class="listHead">
 		<td class="left" width='36%'><?php echo $spTextPanel['Settings']?></td>
 		<td class="right">&nbsp;</td>
@@ -48,26 +48,21 @@
 							<option value="0" <?php echo $selectNo?>><?php echo $spText['common']['No']?></option>
 						</select>
 					<?php }else{?>
-						<input type="text" name="<?php echo $listInfo['set_name']?>" value="<?php echo stripslashes($listInfo['set_val'])?>" style='width:<?php echo $width?>px'>					
+						<input type="text" class="form-control" name="<?php echo $listInfo['set_name']?>" value="<?php echo stripslashes($listInfo['set_val'])?>" style='width:<?php echo $width?>px'>					
 					<?php }?>
 				<?php }else{?>
-					<textarea name="<?php echo $listInfo['set_name']?>" style='width:<?php echo $width?>px'><?php echo stripslashes($listInfo['set_val'])?></textarea>
+					<textarea class="form-control" name="<?php echo $listInfo['set_name']?>" ><?php echo stripslashes($listInfo['set_val'])?></textarea>
+				<?php }?>
+				<?php if ($listInfo['set_name'] == 'QWP_PROXY_BLOCK_URLS') {?>
+					<p><?php echo $pluginText['QWP_PROXY_BLOCK_URLS_comment']?></p>
 				<?php }?>
 			</td>
 		</tr>
 		<?php 
 	}
-	?>		
-	<tr class="blue_row">
-		<td class="tab_left_bot_noborder"></td>
-		<td class="tab_right_bot"></td>
-	</tr>
-	<tr class="listBot">
-		<td class="left" colspan="1"></td>
-		<td class="right"></td>
-	</tr>
+	?>
 </table>
-<table width="100%" cellspacing="0" cellpadding="0" border="0" class="actionSec">
+<table class="actionSec">
 	<tr>
     	<td style="padding-top: 6px;text-align:right;">
     		<a onclick="<?php echo pluginGETMethod('action=settings', 'content')?>" href="javascript:void(0);" class="actionbut">

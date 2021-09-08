@@ -85,7 +85,7 @@ class MysqliHelper extends Database{
 		mysqli_free_result($res);
 		
 		if ($fetchFirst){
-			return $returnArr[0];
+		    return !empty($returnArr) ? $returnArr[0] : $returnArr;
 		}
 		
 		return $returnArr;
@@ -100,7 +100,6 @@ class MysqliHelper extends Database{
 			$this->lastInsertId = @mysqli_insert_id($this->connectionId);
 		} else {
 			$this->showError();
-			@mysqli_free_result($res);
 		}
 		
 		if($noRows) $this->noRows = mysqli_num_rows($res);

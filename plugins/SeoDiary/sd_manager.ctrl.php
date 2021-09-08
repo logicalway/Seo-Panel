@@ -11,7 +11,7 @@ class SD_Manager extends SeoDiary {
 
 	function __construct() {
 		parent::__construct();
-		parent::initPlugin(true);
+		$this->setPluginTextsForRender ( $this->textCategory, $this->textTable );
 		$this->statusList = array(
 			'new' => $this->pluginText['New'],
 			'closed' => $this->pluginText['Closed'],
@@ -22,7 +22,7 @@ class SD_Manager extends SeoDiary {
 		);
 	}
 	
-	function showSDList($info = "") {
+	function showSDList($info=[]) {
 		$userId = isLoggedIn ();
 		$this->set ( 'post', $info );
 		$cond = "";
@@ -37,7 +37,7 @@ class SD_Manager extends SeoDiary {
 		        foreach ($projectList as $projectInfo) $prjIdList[] = $projectInfo['id'];
 		        $cond .= " and d.project_id in (".implode(',', $prjIdList).")";
 		    } else {
-		        $cond .= " and d.assigned_user_id=$userId";
+		        $cond .= " and (d.assigned_user_id=$userId or d.created_user_id=$userId)";
 		    }
 		}
 		
@@ -85,7 +85,7 @@ class SD_Manager extends SeoDiary {
 	/*
 	 * func to create new project
 	 */
-	function newDiary($info = '') {
+	function newDiary($info = []) {
 		$userId = isLoggedIn ();
 		$userCtrler = new UserController ();
 		$userList = $userCtrler->__getAllUsers ();
@@ -94,7 +94,7 @@ class SD_Manager extends SeoDiary {
 		$projectCtrler = $this->createHelper ( 'Project' );
 		$projectList = $projectCtrler->__getAllProjects ( $userId, true );
 		$this->set ( 'projectList', $projectList );
-		
+				
 		$categoryList = $this->selectDiaryCategory ();
 		$this->set ( 'categoryList', $categoryList );
 		$this->set( 'statusList', $this->statusList);
@@ -277,7 +277,7 @@ class SD_Manager extends SeoDiary {
 	/*
 	 * func to create new comments
 	 */
-	function newDiaryComments($info = '') {
+	function newDiaryComments($info = []) {
 		$this->set ( 'post', $info );
 		$userId = isLoggedIn();
 		
@@ -334,7 +334,7 @@ class SD_Manager extends SeoDiary {
 	/*
 	 * func to project shummary
 	 */
-	function showProjectSummery($info = '') {
+	function showProjectSummery($info = []) {
 		$this->set ( 'post', $info );
 		$userId = isLoggedIn ();
 		$projectCtrler = $this->createHelper ( 'Project' );
@@ -367,7 +367,7 @@ class SD_Manager extends SeoDiary {
 	/*
 	 * show tasks assigned users
 	 */
-	function showTaskList($info = "") {
+	function showTaskList($info = []) {
 		$this->set ( 'post', $info );
 		$userId = isLoggedIn ();
 		$cond .= " and d.assigned_user_id=$userId";
