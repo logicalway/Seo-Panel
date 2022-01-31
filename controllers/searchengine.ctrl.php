@@ -200,7 +200,7 @@ class SearchEngineController extends Controller{
 	    }
 	    
 	    $dataList = ['status' => 0];
-	    $syncUrl = SP_MAIN_SITE . "/get_searchengine_updates.php";
+		$syncUrl = "https://www.wp-demo.ch/google/get_searchengine_updates.php"; // $syncUrl = SP_MAIN_SITE . "/get_searchengine_updates.php";
 	    $ret = $this->spider->getContent($syncUrl);
 	    if (!empty($ret['page'])) {
 	        
